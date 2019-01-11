@@ -1,0 +1,8 @@
+#ifndef AQ_DISPANCER_H_
+#define AQ_DISPANCER_H_
+
+void dispancer_open();
+void dispancer_close();
+void dispancer_feed();
+
+#endif /* AQ_DISPANCER_H_ */

@@ -1,0 +1,10 @@
+#ifndef AQ_INTERFACE_H_
+#define AQ_INTERFACE_H_
+
+void print_text();
+void interface_init();
+void interface_on_input();
+void interface_on_input_w_pin();
+void interface_display();
+
+#endif /* AQ_INTERFACE_H_ */

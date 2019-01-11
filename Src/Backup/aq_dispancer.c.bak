@@ -1,0 +1,33 @@
+#include "main.h"
+
+const int OPEN = 1;
+const int CLOSE = 0;
+volatile int current_state;
+
+volatile int open_tick;
+
+static void dispancer_set_state(int state) {
+	current_state = state;
+
+	float rotation = 0;
+	if (state == OPEN) {
+		rotation = 0.5;
+	}
+
+	TIM_HandleTypeDef htim10;
+
+	htim10.Instance = TIM10;
+	TIM10->PSC = SystemCoreClock / 1e6 - 1;
+	TIM10->CCR1 = 2500 - (int) (125 * (1 + rotation));
+
+	HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1);
+}
+
+
+void dispancer_feed() {
+	open_tick = HAL_GetTick();
+	dispancer_set_state(OPEN);
+	HAL_Delay(1000);
+	dispancer_set_state(CLOSE);
+}
+

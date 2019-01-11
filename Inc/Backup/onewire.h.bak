@@ -1,0 +1,13 @@
+#ifndef ONEWIRE_H_
+#define ONEWIRE_H_
+
+void encode_message();
+void init_default_structure();
+int one_wire_reset();
+int one_wire_power_supply();
+int one_wire_convert_temperature();
+void one_wire_get_scratch();
+void get_temperature();
+
+
+#endif /* ONEWIRE_H_ */

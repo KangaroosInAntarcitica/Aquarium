@@ -1,0 +1,106 @@
+#include "main.h"
+
+void encode_message(uint8_t* message, int size, uint8_t* result, int receive_size) {
+	uint8_t ONE = 0x7E;
+	uint8_t ZERO = 0x00;
+	uint8_t RECEIVE = 0x7E;
+
+	for (int byte = 0; byte < size; byte++) {
+		for (int i = 0; i < 8; i++) {
+			result[byte * 8 + i] = (message[byte] >> i) & 1 ? ONE : ZERO;
+		}
+	}
+	for (int bit = 0; bit < receive_size * 8; bit++) {
+		result[size * 8 + bit] = RECEIVE;
+	}
+}
+
+void init_default_structure(USART_InitTypeDef* init_structure) {
+	init_structure->BaudRate = 115200;
+	init_structure->WordLength = USART_WORDLENGTH_8B;
+	init_structure->StopBits = USART_STOPBITS_1;
+	init_structure->Parity = USART_PARITY_NONE;
+	init_structure->Mode = USART_MODE_TX_RX;
+}
+USART_HandleTypeDef handle_structure;
+USART_InitTypeDef init_structure;
+
+int one_wire_reset() {
+	init_default_structure(&init_structure);
+	init_structure.BaudRate = 9600;
+	handle_structure.Instance = USART2;
+	handle_structure.Init = init_structure;
+
+	HAL_USART_Init(&handle_structure);
+
+	uint8_t transmit_data[] = {0x40};
+	uint8_t receive_data[1];
+	HAL_USART_Abort(&handle_structure);
+	HAL_USART_TransmitReceive(&handle_structure, transmit_data, receive_data, 1, 100);
+
+	HAL_Delay(10);
+
+	init_default_structure(&init_structure);
+	HAL_USART_Init(&handle_structure);
+
+	return receive_data[0] != 0x40;
+}
+
+int one_wire_power_supply() {
+	uint8_t command[] = {0xCC, 0xB4};
+	uint8_t code[3 * 8];
+	uint8_t result[sizeof(code)];
+
+	encode_message(command, 2, code, 1);
+	HAL_USART_TransmitReceive(&handle_structure, code, result, sizeof(code), 1000);
+
+	return result[16];
+}
+
+int one_wire_convert_temperature() {
+	uint8_t convert_command[3] = {0xCC, 0x44, 0};
+	uint8_t convert_code[sizeof(convert_command) * 8];
+	uint8_t result[sizeof(convert_code)];
+
+	encode_message(convert_command, 2, convert_code, 1);
+	HAL_USART_TransmitReceive(&handle_structure, convert_code, result, sizeof(convert_code), 1000);
+
+	return result[16];
+}
+
+void one_wire_get_scratch() {
+	uint8_t read_command[4] = {0xCC, 0xBE, 0, 0};
+	uint8_t read_code[sizeof(read_command) * 8];
+	encode_message(read_command, 2, read_code, 2);
+	uint8_t scratch[sizeof(read_code)];
+
+	HAL_USART_TransmitReceive(&handle_structure, read_code, scratch, sizeof(read_code), 1000);
+	uint16_t temperature=0;
+
+	for (uint16_t i=16; i<32; i++) {
+		if (scratch[i] == 0xff) {
+			temperature |= 1 << (i - 16);
+		}
+	}
+
+	current_temperature = ((double) temperature) / 16;
+}
+
+void get_temperature() {
+	// One Wire
+	int result = one_wire_reset();
+	// int power = one_wire_power_supply();
+
+//	HAL_Delay(1000);
+//	one_wire_reset();
+//	one_wire_get_scratch();
+
+	static int i;
+
+	char text[100];
+	sprintf(text, "%d - %d %d\n", ++i, result);
+	print_text(text);
+	HAL_Delay(1000);
+
+	// current_temperature = result;
+}
