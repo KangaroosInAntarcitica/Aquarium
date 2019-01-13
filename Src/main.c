@@ -110,20 +110,22 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 TM_OneWire_t oneWire;
 
+const ONEWIRE_TRANSLATE_TEMPERATURE = 0x44;
+
 void get_temperature() {
 	int result = 1;
 	result &= TM_OneWire_Reset(&oneWire);
 	TM_OneWire_WriteByte(&oneWire, ONEWIRE_CMD_SKIPROM);
-	TM_OneWire_WriteByte(&oneWire, 0x44);
+	TM_OneWire_WriteByte(&oneWire, ONEWIRE_TRANSLATE_TEMPERATURE);
 	int reading;
 	while ((reading = TM_OneWire_ReadByte(&oneWire)) == 0){};
 
 	result &= TM_OneWire_Reset(&oneWire);
 	TM_OneWire_WriteByte(&oneWire, ONEWIRE_CMD_SKIPROM);
-	TM_OneWire_WriteByte(&oneWire, 0xBE);
+	TM_OneWire_WriteByte(&oneWire, ONEWIRE_CMD_RSCRATCHPAD);
 	uint16_t temperature = TM_OneWire_ReadByte(&oneWire) + TM_OneWire_ReadByte(&oneWire) * 0x100;
 
-	if (temperature < 16000)
+	if (temperature != 65535)
 		set_current_temperature((double) temperature / 16);
 }
 
@@ -201,6 +203,7 @@ int main(void)
 	get_temperature();
 	interface_display();
 	heater_adapt();
+	HAL_Delay(1000);
 
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
