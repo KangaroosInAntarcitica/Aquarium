@@ -190,7 +190,7 @@ int main(void)
 
   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, 1);
 
-  while (13)
+  while (1)
   {
 
 	// get_temperature();
@@ -198,28 +198,9 @@ int main(void)
 
 	// dispancer_feed();
 
-//	get_temperature();
-//	interface_display();
-//	heater_adapt();
-
-//	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, 1);
-//	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, 0);
-//	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, 0);
-//	HAL_Delay(100);
-//
-//	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, 0);
-//	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, 1);
-//	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, 0);
-//	HAL_Delay(100);
-//
-//	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, 0);
-//	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, 0);
-//	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, 1);
-
-	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, 1);
-	HAL_Delay(1);
-	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, 0);
-	HAL_Delay(5);
+	get_temperature();
+	interface_display();
+	heater_adapt();
 
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
