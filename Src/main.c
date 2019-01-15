@@ -110,7 +110,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 TM_OneWire_t oneWire;
 
-const ONEWIRE_TRANSLATE_TEMPERATURE = 0x44;
+const int ONEWIRE_TRANSLATE_TEMPERATURE = 0x44;
 
 void get_temperature() {
 	int result = 1;
@@ -190,15 +190,8 @@ int main(void)
 
   init_all();
 
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, 1);
-
   while (1)
   {
-
-	// get_temperature();
-	// interface_on_input();
-
-	// dispancer_feed();
 
 	get_temperature();
 	interface_display();

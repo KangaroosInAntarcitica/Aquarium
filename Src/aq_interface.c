@@ -18,8 +18,8 @@ volatile int light_state = 0;
 
 void print_text(char* text) {
 	// Auxiliary function, prints text on display
-	LCD5110_clear_scr(&interface_lcd);
 	LCD5110_set_cursor(0, 0, &interface_lcd);
+	// LCD5110_clear_scr(&interface_lcd);
 	LCD5110_print(text, BLACK, &interface_lcd);
 }
 
@@ -29,10 +29,23 @@ void interface_display() {
 	if (current_menu == start_menu) {
 		char temperature[100];
 		sprintf(temperature, "%.2f/%d", get_current_temperature(), get_required_temperature());
-		sprintf(text, "Hello\nt:%11s\nA - set temp\nB - light %s\nC - feed\n", temperature, light_state ? "off" : "on");
+		sprintf(text,
+				"Hello        \n"
+				"t:%11s\n"
+				"A - set temp \n"
+				"B - light %s\n"
+				"C - feed     \n",
+				temperature,
+				light_state ? "off" : "on ");
 	}
 	else if (current_menu == input_menu) {
-		sprintf(text, "%13d\nA - accept\nC - cancel\nD - delete\n", current_number_input);
+		sprintf(text,
+				"%13d\n"
+				"A - accept   \n"
+				"C - cancel   \n"
+				"D - delete   \n"
+				"             \n",
+				current_number_input);
 	}
 
 	print_text(text);
