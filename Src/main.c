@@ -54,6 +54,7 @@
 #include "i2s.h"
 #include "spi.h"
 #include "tim.h"
+#include "usart.h"
 #include "usb_host.h"
 #include "gpio.h"
 
@@ -99,7 +100,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim->Instance == TIM10)
 	{
-		dispancer_timer_callback();
+		dispenser_timer_callback();
 	}
 }
 
@@ -108,41 +109,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-TM_OneWire_t oneWire;
-
-const int ONEWIRE_TRANSLATE_TEMPERATURE = 0x44;
-
-void get_temperature() {
-	int result = 1;
-	result &= TM_OneWire_Reset(&oneWire);
-	TM_OneWire_WriteByte(&oneWire, ONEWIRE_CMD_SKIPROM);
-	TM_OneWire_WriteByte(&oneWire, ONEWIRE_TRANSLATE_TEMPERATURE);
-	int reading;
-	while ((reading = TM_OneWire_ReadByte(&oneWire)) == 0){};
-
-	result &= TM_OneWire_Reset(&oneWire);
-	TM_OneWire_WriteByte(&oneWire, ONEWIRE_CMD_SKIPROM);
-	TM_OneWire_WriteByte(&oneWire, ONEWIRE_CMD_RSCRATCHPAD);
-	uint16_t temperature = TM_OneWire_ReadByte(&oneWire) + TM_OneWire_ReadByte(&oneWire) * 0x100;
-
-	if (temperature != 65535)
-		set_current_temperature((double) temperature / 16);
-}
-
 void init_all() {
 	// Interface
 	interface_init();
 	interface_display();
 
 	// Dispenser
-	dispancer_init();
+	dispenser_init();
 	// Enable interrupt for timer 10
 	HAL_TIM_Base_Start_IT(&htim10);
 
-	// One Wire
-	/* Init system clock for maximum system speed */
-	TM_RCC_InitSystem();
-	TM_OneWire_Init(&oneWire, GPIOB, GPIO_PIN_4);
+	temperature_init();
 }
 
 /* USER CODE END 0 */
@@ -181,6 +158,7 @@ int main(void)
   MX_USB_HOST_Init();
   MX_SPI2_Init();
   MX_TIM10_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -192,10 +170,11 @@ int main(void)
 
   while (1)
   {
-
-	get_temperature();
+	// Perform the basic loop of the program
+	temperature_measure();
 	interface_display();
 	heater_adapt();
+	// wifi_module_send();
 	HAL_Delay(1000);
 
     /* USER CODE END WHILE */

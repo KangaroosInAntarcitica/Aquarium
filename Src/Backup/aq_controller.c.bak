@@ -20,3 +20,17 @@ void set_required_temperature(int temperature) {
 		required_temperature = temperature;
 	}
 }
+
+int heater_pin_base = GPIOB;
+int heater_pin = GPIO_PIN_7;
+
+void heater_adapt() {
+	int heat_on = HAL_GPIO_ReadPin(heater_pin_base, heater_pin);
+
+	if (!heat_on && current_temperature < required_temperature) {
+		HAL_GPIO_WritePin(heater_pin_base, heater_pin, 1);
+	}
+	else if (heat_on && current_temperature > required_temperature) {
+		HAL_GPIO_WritePin(heater_pin_base, heater_pin, 0);
+	}
+}
