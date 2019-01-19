@@ -19,6 +19,8 @@ Automated aquarium with the following features:
 8) [ESP-12F WiFi Module](https://www.elecrow.com/download/ESP-12F.pdf)
 
 ## Microcontroller pin configuration
+General configuration of pins:
+![config.jpg](__images/config.jpg)
 
 ### Display:
 ![Display](__images/display.png)
@@ -31,10 +33,18 @@ The functions for display is in [aq_interface.c](Src/aq_interface.c)
 
 For thermometer we need 3 pins. Connection to thermometer is by OneWire, for this we used [library](). Functions to work with it is in [aq_controller.c](Src/aq_controller.c).
 
+### Darlington and resistor
+![darlington.png](__images/darlington.png)
+
+Connect input of Darlington to PB7, as on image. Functions for maintaining of temperature is in [aq_controller.c](Src/aq_controller.c).
+
 ### Keyboard:
 ![Keyboard](__images/keyboard.png)
 
 From left to right first four for output - PD8-PD11, next four for input - PD0-PD3 (configured for interrupt).
 The code for keyboard is in [keyboard.c](Src/keyboard.c).
 
-### 
+### SERVO MOTOR SG90
+![servo.png](__images/servo.png)
+
+For working with SERVO MOTOR SG90 we need 3 pins, PB8 for output, Vcc and Ground.
