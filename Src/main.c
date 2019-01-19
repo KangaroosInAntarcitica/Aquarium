@@ -54,13 +54,12 @@
 #include "i2s.h"
 #include "spi.h"
 #include "tim.h"
-#include "usart.h"
 #include "usb_host.h"
 #include "gpio.h"
+#include "usart.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
 
 /* USER CODE END Includes */
 
@@ -108,6 +107,30 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+// WIFI MODULE FUNCTIONS
+void wifi_module_send_data() {
+	char data[1000];
+	char text[] = "{\"current_temperature\":%d.%02d,"
+			"\"required_temperature\":%d,"
+			"\"heater_on\":%d,"
+			"\"dispenser_open\":%d}";
+	float temperature = get_current_temperature();
+	sprintf(data, text,
+			(int) temperature, (int) (temperature * 100) - ((int) temperature) * 100,
+			get_required_temperature(),
+			heater_is_on(),
+			dispenser_get_state() == open);
+
+	HAL_UART_Transmit(&huart2, data, cstr_size(data), 1000);
+}
+
+
+int cstr_size(char* str) {
+	int size = 0;
+	while (str[size++] != '\0') {};
+	return size;
+}
 
 void init_all() {
 	// Interface
@@ -174,7 +197,7 @@ int main(void)
 	temperature_measure();
 	interface_display();
 	heater_adapt();
-	// wifi_module_send();
+	wifi_module_send_data();
 	HAL_Delay(1000);
 
     /* USER CODE END WHILE */

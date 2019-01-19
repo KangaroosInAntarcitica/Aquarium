@@ -1,6 +1,6 @@
 #include "main.h"
 
-volatile double current_temperature = 20.0;
+volatile double current_temperature = 20.5;
 volatile int required_temperature = 20;
 
 // Functions to get and set temperature / current temperature

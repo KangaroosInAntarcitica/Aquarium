@@ -12,6 +12,8 @@ void set_required_temperature(int temperature);
 void temperature_init();
 void temperature_measure();
 
+// HEATER FUNCTIONS
+int heater_is_on();
 void heater_adapt();
 
 #endif /* AQ_CONTROLLER_H_ */
