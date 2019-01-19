@@ -20,7 +20,7 @@ Automated aquarium with the following features:
 
 ## Microcontroller pin configuration
 General configuration of pins:
-![config.jpg](__images/config.jpg = 250x)
+![config.jpg](__images/config.jpg =250x)
 
 ### Display:
 ![Display](__images/display.png)
@@ -29,22 +29,22 @@ For dislpay we need 8 pins, we connect it as follows: RST - PB10, CE - PB14, DC 
 The functions for display is in [aq_interface.c](Src/aq_interface.c)
 
 ### Thermometer:
-![Thermometer](__images/thermomether.png = 250x)
+![Thermometer](__images/thermomether.png =250x)
 
 For thermometer we need 3 pins. Connection to thermometer is by OneWire, for this we used [library](). Functions to work with it is in [aq_controller.c](Src/aq_controller.c).
 
 ### Darlington and resistor
-![darlington.png](__images/darlington.png = = 250x)
+![darlington.png](__images/darlington.png =250x)
 
 Connect input of Darlington to PB7, as on image. Functions for maintaining of temperature is in [aq_controller.c](Src/aq_controller.c).
 
 ### Keyboard:
-![Keyboard](__images/keyboard.png = 250x)
+![Keyboard](__images/keyboard.png =250x)
 
 From left to right first four for output - PD8-PD11, next four for input - PD0-PD3 (configured for interrupt).
 The code for keyboard is in [keyboard.c](Src/keyboard.c).
 
 ### SERVO MOTOR SG90
-![servo.png](__images/servo.png = 250x)
+![servo.png](__images/servo.png =250x)
 
 For working with SERVO MOTOR SG90 we need 3 pins, PB8 for output, Vcc and Ground. The code for it is in [aq_dispancer.c](Src/aq_dispancer.c).
