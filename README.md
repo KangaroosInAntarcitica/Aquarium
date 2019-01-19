@@ -48,3 +48,5 @@ The code for keyboard is in [keyboard.c](Src/keyboard.c).
 <img src="__images/servo.png" height="400">
 
 For working with SERVO MOTOR SG90 we need 3 pins, PB8 for output, Vcc and Ground. The code for it is in [aq_dispancer.c](Src/aq_dispancer.c).
+
+### WiFi Module
