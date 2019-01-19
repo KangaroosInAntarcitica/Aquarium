@@ -31,7 +31,7 @@ The functions for display is in [aq_interface.c](Src/aq_interface.c)
 ### Thermometer:
 <img src="__images/thermomether.png" height="400">
 
-For thermometer we need 3 pins. Connection to thermometer is by OneWire, for this we used [library](). Functions to work with it is in [aq_controller.c](Src/aq_controller.c).
+For thermometer we need 3 pins. Thermometer use OneWire interface for communication using [external library](https://stm32f4-discovery.net/2015/07/hal-library-05-onewire-for-stm32fxxx/). Functions to work with it is in [aq_controller.c](Src/aq_controller.c).
 
 ### Darlington and resistor
 <img src="__images/darlington.png" height="400">
