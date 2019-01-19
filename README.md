@@ -32,7 +32,7 @@ The functions for display is in [aq_interface.c](Src/aq_interface.c)
 For thermometer we need 3 pins. Connection to thermometer is by OneWire, for this we used [library](). Functions to work with it is in [aq_controller.c](Src/aq_controller.c).
 
 ### Keyboard:
-![Keyboard](__images/keyboard.jpg)
+![Keyboard](__images/keyboard.png)
 
 From left to right first four for output - PD8-PD11, next four for input - PD0-PD3 (configured for interrupt).
 The code for keyboard is in [keyboard.c](Src/keyboard.c).
