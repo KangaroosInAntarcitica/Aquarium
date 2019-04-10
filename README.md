@@ -1,17 +1,7 @@
-<style>
-    * {
-        color: #333333;
-    }
-    a {
-        color: #ff7575;
-    }
-</style>
-
-
 # Aquarium
 Automised aquarium with STM32
 
-<img src="__images/aquarium.png" height="400">
+<img src="__images/aquarium.png" width="400">
 
 ## Description of the project:
 Automated aquarium with the following features:
@@ -122,13 +112,15 @@ status back to server.
 <img src="__images/website.png" width="200">
 
 ## Microcontroller pin configuration
-General configuration of pins:
+General configuration of pins:  
+
 <img src="__images/config.jpg" height="400">
 
-<img src="__images/aquarium_top.jpg" height="400">
+<img src="__images/aquarium_top.jpg" width="300">
 
 ### Display:
-<img src="__images/aquarium_display.jpg" height="400">
+<img src="__images/aquarium_display.png" height="300">
+
 <img src="__images/display.png" height="400">
 
 For dislpay we need 8 pins, we connect it as follows: `RST - PB10`, `CE - PB14`, `DC - PB12`, `DIN - PB15`, `CLK -PB13`, `VCC - 5V`, `BL - PB7`, `GND - Ground`.
