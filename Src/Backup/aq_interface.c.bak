@@ -96,7 +96,7 @@ static void on_choice(button choice) {
 	  }
 	  if (choice == button_c) {
 		  // Feed the fish
-		  dispancer_feed();
+		  dispenser_feed();
 	  }
   }
   else if (current_menu == input_menu) {

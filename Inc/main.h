@@ -69,6 +69,7 @@ extern "C" {
 #include "aq_interface.h"
 #include "aq_controller.h"
 #include "aq_dispancer.h"
+#include "wifi_node_mcu.h"
 
 /* USER CODE END Includes */
 

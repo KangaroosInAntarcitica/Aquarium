@@ -63,12 +63,12 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+#include "stm32f4xx_hal_uart.h"
 #include "tm_stm32_onewire.h"
 #include "aq_interface.h"
 #include "aq_controller.h"
 #include "aq_dispancer.h"
-
-
 
 /* USER CODE END Includes */
 

@@ -1,8 +1,8 @@
 #include "main.h"
 
 // Open and close rotation from 0 to 1
-const float ROTATION_OPEN = 0.5;
-const float ROTATION_CLOSED = 0.0;
+const float ROTATION_OPEN = 0.4;
+const float ROTATION_CLOSED = 0.866;
 
 // Time we wait
 uint16_t wait_time = 500;

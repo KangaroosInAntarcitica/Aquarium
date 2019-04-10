@@ -52,11 +52,12 @@
 #include "main.h"
 #include "i2c.h"
 #include "i2s.h"
+#include "iwdg.h"
 #include "spi.h"
 #include "tim.h"
+#include "usart.h"
 #include "usb_host.h"
 #include "gpio.h"
-#include "usart.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -109,20 +110,128 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 /* USER CODE BEGIN 0 */
 
 // WIFI MODULE FUNCTIONS
-void wifi_module_send_data() {
-	char data[1000];
+char* request = NULL;
+char first_request = 1;
+char opened_dispenser = 0;
+
+char* wifi_create_request() {
+	free(request);
+	request = malloc(1000);
+	if (request == NULL)
+		return NULL;
+
 	char text[] = "{\"current_temperature\":%d.%02d,"
 			"\"required_temperature\":%d,"
-			"\"heater_on\":%d,"
-			"\"dispenser_open\":%d}";
+			"\"heater\":%d,"
+			"\"dispenser\":%d,"
+			"\"first\":%d}";
 	float temperature = get_current_temperature();
-	sprintf(data, text,
+	sprintf(request, text,
 			(int) temperature, (int) (temperature * 100) - ((int) temperature) * 100,
 			get_required_temperature(),
 			heater_is_on(),
-			dispenser_get_state() == open);
+			opened_dispenser,
+			first_request);
 
-	HAL_UART_Transmit(&huart2, data, cstr_size(data), 1000);
+	first_request = 0;
+	return request;
+}
+
+const char* WHITESPACE = " \n\t\r\v";
+const char NUMBER_SPLIT = '.';
+double parse_number(char* string) {
+	float result = 0;
+	int split_i = -1;
+
+	for (int i = 0; string[i] != '\0'; ++i) {
+		double number = (double) (string[i] - '0');
+
+		if (number >= 0 && number <= 9) {
+			if (split_i == -1)
+				result = result * 10 + number;
+			else {
+				int fraction = i - split_i;
+				for (int j = 0; j < fraction; ++j) number /= 10;
+				result += number;
+			}
+		}
+		else if (string[i] == NUMBER_SPLIT) {
+			if (split_i != -1) break;
+			split_i = i;
+		}
+		else {
+			break;
+		}
+	}
+
+	return result;
+}
+
+int is_whitespace(char c) {
+	for (int i = 0; WHITESPACE[i] != '\0'; ++i) {
+		if (WHITESPACE[i] == c) return 1;
+	}
+	return 0;
+}
+
+int skip_word(char* string) {
+	int i = 0;
+	for (; string[i] != '\0' && !is_whitespace(string[i]); ++i);
+	for (; string[i] != '\0' && is_whitespace(string[i]); ++i);
+	return i;
+}
+
+void read_response(char* response) {
+	if (response[0]) {
+		HAL_Delay(1000);
+	}
+
+	double required_temperature = parse_number(&response[0]);
+	set_required_temperature(required_temperature);
+
+	int word_start = skip_word(&response[0]);
+	double open_dispenser = parse_number(&response[word_start]);
+	if (open_dispenser) {
+		dispenser_feed();
+		opened_dispenser = 1;
+	} else {
+		opened_dispenser = 0;
+	}
+}
+
+char* wifi_uuid = "UCU-Guests";
+char* wifi_password = "";
+
+char* url = "http://kangaroosinantarctica.pythonanywhere.com/aquarium/data";
+char* response;
+
+void wifi_module_process(WifiController* wifi_controller) {
+	int is_connected = wifi_is_connected(wifi_controller);
+
+	if (!is_connected) {
+		HAL_Delay(2000);
+		is_connected = wifi_is_connected(wifi_controller);
+		HAL_Delay(1000);
+
+		if (!is_connected) {
+			wifi_connect(wifi_controller, wifi_uuid, wifi_password);
+			HAL_Delay(5000);
+		}
+	}
+	else {
+		response = wifi_get_response(wifi_controller);
+		read_response(response);
+
+		request = wifi_create_request();
+		if (request == NULL) return;
+		HAL_Delay(1000);
+
+		int result = wifi_configure_request(wifi_controller, WIFI_REQUEST_TYPE_POST, url);
+		HAL_Delay(250);
+		result = wifi_send_request(wifi_controller, request);
+
+		HAL_Delay(3000);
+	}
 }
 
 
@@ -182,6 +291,7 @@ int main(void)
   MX_SPI2_Init();
   MX_TIM10_Init();
   MX_USART2_UART_Init();
+  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -191,14 +301,19 @@ int main(void)
 
   init_all();
 
+  WifiController wifi_controller;
+  wifi_init(&wifi_controller, &huart2);
+
   while (1)
   {
 	// Perform the basic loop of the program
+	IWDG->KR = 0x0000AAAAU;
+
 	temperature_measure();
 	interface_display();
 	heater_adapt();
-	wifi_module_send_data();
-	HAL_Delay(1000);
+
+	wifi_module_process(&wifi_controller);
 
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
@@ -224,8 +339,9 @@ void SystemClock_Config(void)
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
   /**Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 4;

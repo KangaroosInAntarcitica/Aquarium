@@ -56,8 +56,8 @@ void temperature_measure() {
 	TM_OneWire_WriteByte(&oneWire, ONEWIRE_CMD_RSCRATCHPAD);
 	uint16_t temperature = TM_OneWire_ReadByte(&oneWire) + TM_OneWire_ReadByte(&oneWire) * 0x100;
 
-	// 0xFFFF (max value) - termometer did not react
-	if (temperature != 0xFFFF) {
+	// 0xFFFF (max value) - thermometer did not react
+	if (temperature != 0xFFFF && temperature != 0x0000) {
 		set_current_temperature((double) temperature / 16);
 	}
 }
@@ -67,20 +67,23 @@ void temperature_measure() {
 GPIO_TypeDef* heater_port = GPIOB;
 int heater_pin = GPIO_PIN_7;
 
+const int HEATER_ON = 0;
+const int HEATER_OFF = 1;
+
 int heater_is_on() {
 	// returns whether heater is currently heating
-	return HAL_GPIO_ReadPin(heater_port, heater_pin);
+	return HAL_GPIO_ReadPin(heater_port, heater_pin) == HEATER_ON;
 }
 
 void heater_adapt() {
 	// checks whether heater needs to be on and reacts correspondingly
-	int heat_on = HAL_GPIO_ReadPin(heater_port, heater_pin);
+	int heat_on = ! HAL_GPIO_ReadPin(heater_port, heater_pin);
 
 	if (!heat_on && current_temperature < required_temperature) {
-		HAL_GPIO_WritePin(heater_port, heater_pin, 1);
+		HAL_GPIO_WritePin(heater_port, heater_pin, HEATER_ON);
 	}
 	else if (heat_on && current_temperature > required_temperature) {
-		HAL_GPIO_WritePin(heater_port, heater_pin, 0);
+		HAL_GPIO_WritePin(heater_port, heater_pin, HEATER_OFF);
 	}
 }
 
