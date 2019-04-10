@@ -11,7 +11,7 @@
 # Aquarium
 Automised aquarium with STM32
 
-<img src="__images/aquarium.jpg" height="400">
+<img src="__images/aquarium.png" height="400">
 
 ## Description of the project:
 Automated aquarium with the following features:
