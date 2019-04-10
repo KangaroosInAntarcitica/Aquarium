@@ -1,0 +1,34 @@
+<script>
+let nominalT = 25;
+let constB = 3950;
+let thermistorR = 110000;
+let serialR = 100000;
+
+let convertAnalogIntoT = (voltage) => {
+    let tr = 1023 / voltage - 1;
+    tr = serialR / tr;
+    
+    let value = tr / thermistorR;
+    value = Math.log(value);
+    value /= constB;
+
+    value += 1 / (nominalT + 273.15);
+    value = 1 / value;
+    let temperature = value - 273.15;
+    
+    return temperature;
+} 
+
+let convertTtoAnalogIn = (t) => {
+    let absolute = t + 273.15;
+    let value = 1 / absolute;
+    value -= 1 / (nominalT + 273.15);
+    value *= constB;
+    value = Math.E ** value;
+    let tr = value * thermistorR;
+    
+    let resistance = serialR / tr;
+    resistance = 1023 / (resistance + 1);
+    return resistance;
+}
+</script>
